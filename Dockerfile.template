@@ -1,0 +1,14 @@
+ARG OS
+FROM $OS
+
+ARG PAC_UPD
+ARG PAC_INST
+
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+RUN $PAC_UPD && $PAC_INST gcc curl git
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > /tmp/rustup && sh /tmp/rustup -y
+ADD rs-docker-builder/build-internal.sh /
+RUN mkdir -p /dummy/src
+COPY Cargo.toml /dummy
+RUN source $HOME/.cargo/env && cd /dummy && echo "// dummy file" > src/lib.rs && cargo build --release
