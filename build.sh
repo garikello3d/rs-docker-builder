@@ -40,6 +40,7 @@ cat PLATFORMS | sed '/^#/d;/^[[:space:]]*$/d' | while IFS="|" read IDENT FROM PA
 
     TYPE=$(echo $FROM | cut -f1 -d/)
     HOST=$(echo $FROM | cut -f2 -d/)
+    TO_INSTALL=$(cat INSTALL_SPEC)
 
     cd ..
     case $2 in 
@@ -68,7 +69,7 @@ cat PLATFORMS | sed '/^#/d;/^[[:space:]]*$/d' | while IFS="|" read IDENT FROM PA
             TMP_DIR=$(mktemp -d /tmp/$APP_NAME-XXX)
             DIST_DIR=$TMP_DIR/dist
             mkdir $DIST_DIR
-            cp -a .VERSION *.rs Cargo.toml src/ tests/ $DIST_DIR/
+            for F in $TO_INSTALL; do cp -av "$F" $DIST_DIR/ ; done
             (cd $DIST_DIR && tar cf $TMP_DIR/sources.tar . )
             rm -rf $DIST_DIR
             OUT_DIR=rs-docker-builder/build/$IDENT
