@@ -33,13 +33,12 @@ cat PLATFORMS | sed '/^#/d;/^[[:space:]]*$/d' | while IFS="|" read IDENT FROM PA
 
     if [ -n "$OS" ]; then
         if [ "x$OS" != "x$IDENT" ]; then
-            echo non-matching OS $OS \(wanted $IDENT\)
             continue
         fi
     fi
 
     TYPE=$(echo $FROM | cut -f1 -d/)
-    HOST=$(echo $FROM | cut -f2 -d/)
+    HOST=$(echo $FROM | cut -f2,3 -d/)
     TO_INSTALL=$(cat INSTALL_SPEC)
 
     cd ..
@@ -47,7 +46,7 @@ cat PLATFORMS | sed '/^#/d;/^[[:space:]]*$/d' | while IFS="|" read IDENT FROM PA
         --image)
             case $TYPE in
                 docker)
-                    echo preparing docker build image for $IDENT
+                    echo preparing docker build image for $IDENT on platform $HOST
                     docker build -t $APP_NAME-$IDENT --ulimit nofile=1024:262144 -f rs-docker-builder/Dockerfile.template \
                         --build-arg OS=$HOST \
                         --build-arg PAC_UPD="$PAC_UPD" \
